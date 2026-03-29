@@ -1,12 +1,12 @@
 {
     "/api": {
-        "target": "https://project-production-fd17.up.railway.app",
+        "target": "https://your-railway-url.up.railway.app",
         "secure": true,
         "changeOrigin": true,
         "logLevel": "debug"
     },
     "/uploads": {
-        "target": "https://project-production-fd17.up.railway.app",
+        "target": "https://your-railway-url.up.railway.app",
         "secure": true,
         "changeOrigin": true,
         "logLevel": "debug"
