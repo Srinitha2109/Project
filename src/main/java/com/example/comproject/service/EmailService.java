@@ -11,6 +11,7 @@ public class EmailService {
     @Autowired(required = false)
     private JavaMailSender mailSender;
     
+    @org.springframework.scheduling.annotation.Async
     public void sendWelcomeEmail(String toEmail, String fullName, String tempPassword) {
         System.out.println("Full Name: " + fullName);
         System.out.println("Email    : " + toEmail);
@@ -36,6 +37,7 @@ public class EmailService {
         }
     }
     
+    @org.springframework.scheduling.annotation.Async
     public void sendRejectionEmail(String toEmail, String fullName, String reason) {
         if (mailSender == null) {
             System.out.println("Email service not configured. Would send rejection email to: " + toEmail);
