@@ -16,7 +16,8 @@
             <a routerLink="/policyholder/dashboard" routerLinkActive="bg-burgundy text-white shadow-md"
                 [routerLinkActiveOptions]="{exact: true}"
                 class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy">
-                <span class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">dashboard</span>
+                <span
+                    class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">dashboard</span>
                 @if (!isSidebarCollapsed()) {
                 <span class="font-semibold tracking-wide">Dashboard</span>
                 }
@@ -24,7 +25,8 @@
 
             <a routerLink="/policyholder/policies" routerLinkActive="bg-burgundy text-white shadow-md"
                 class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy">
-                <span class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">search</span>
+                <span
+                    class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">search</span>
                 @if (!isSidebarCollapsed()) {
                 <span class="font-semibold tracking-wide">Policies</span>
                 }
@@ -32,7 +34,8 @@
 
             <a routerLink="/policyholder/applications" routerLinkActive="bg-burgundy text-white shadow-md"
                 class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy">
-                <span class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">description</span>
+                <span
+                    class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">description</span>
                 @if (!isSidebarCollapsed()) {
                 <span class="font-semibold tracking-wide">Applications</span>
                 }
@@ -40,7 +43,8 @@
 
             <a routerLink="/policyholder/claims" routerLinkActive="bg-burgundy text-white shadow-md"
                 class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy">
-                <span class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">healing</span>
+                <span
+                    class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">healing</span>
                 @if (!isSidebarCollapsed()) {
                 <span class="font-semibold tracking-wide">Claims</span>
                 }
@@ -48,7 +52,8 @@
 
             <a routerLink="/policyholder/payments" routerLinkActive="bg-burgundy text-white shadow-md"
                 class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy">
-                <span class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">payment</span>
+                <span
+                    class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">payment</span>
                 @if (!isSidebarCollapsed()) {
                 <span class="font-semibold tracking-wide">Payments</span>
                 }
@@ -57,7 +62,8 @@
             <div class="mt-auto pt-4 border-t border-slate-100">
                 <a (click)="logout()"
                     class="flex items-center p-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors cursor-pointer gap-3 group">
-                    <span class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">logout</span>
+                    <span
+                        class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">logout</span>
                     @if (!isSidebarCollapsed()) {
                     <span class="font-semibold tracking-wide">Logout</span>
                     }
@@ -85,8 +91,10 @@
                     </div>
                     }
                     <app-notification-bell></app-notification-bell>
-                    <span class="text-sm font-semibold text-slate-700 hidden sm:block">{{ currentUser()?.fullName }}</span>
-                    <div class="w-10 h-10 bg-burgundy text-white rounded-full flex items-center justify-center font-black shadow-inner text-base ring-4 ring-pink/20">
+                    <span class="text-sm font-semibold text-slate-700 hidden sm:block">{{ currentUser()?.fullName
+                        }}</span>
+                    <div
+                        class="w-10 h-10 bg-burgundy text-white rounded-full flex items-center justify-center font-black shadow-inner text-base ring-4 ring-pink/20">
                         {{ getUserInitials() }}
                     </div>
                 </div>

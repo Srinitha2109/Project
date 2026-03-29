@@ -152,6 +152,7 @@ export class PoliciesComponent implements OnInit {
         });
     }
 
+    //runs initially when page loads
     ngOnInit() {
         this.loadPolicies();
         this.loadBusinessProfile();
@@ -164,7 +165,7 @@ export class PoliciesComponent implements OnInit {
                 setTimeout(() => {
                     this.allPolicies.set(policies.filter(p => p.isActive));
                     this.isLoading.set(false);
-                }, 3000)
+                }, 2000)
             },
             error: () => {
                 this.isLoading.set(false);
@@ -172,13 +173,12 @@ export class PoliciesComponent implements OnInit {
         });
     }
 
-
-
+    //computed is used becuase it dynamically filter and update the ui whenever search query changes
     filteredPolicies = computed(() => {
-        const query = this.policySearchService.searchQuery().toLowerCase().trim();
+        const query = this.policySearchService.searchQuery().toLowerCase().trim(); //returns current search text
         let filtered = this.allPolicies();
-
         if (query) {
+            //keep items that match the condition
             filtered = filtered.filter(p => {
                 const searchableFields = [
                     p.policyName,
@@ -187,10 +187,10 @@ export class PoliciesComponent implements OnInit {
                     p.insuranceTypeDisplayName,
                     p.description
                 ];
+                //if atleast one field match then keep that policy
                 return searchableFields.some(field => this.fuzzyMatch(query, field || ''));
             });
         }
-
         return filtered;
     });
 
@@ -222,7 +222,7 @@ export class PoliciesComponent implements OnInit {
                 }
             });
         } else {
-            console.error('  No user or user.id found for loading business profile');
+            console.error(' No user found for loading business profile');
         }
     }
 
@@ -246,7 +246,7 @@ export class PoliciesComponent implements OnInit {
 
     selectPolicy(policy: Policy) {
         const profile = this.businessProfile();
-        if (!profile) {
+        if (!profile) { //checks if user has a business profile
             this.notificationService.show(
                 'Your business profile is not set up yet. Please contact the admin.',
                 'warning'
@@ -338,6 +338,11 @@ export class PoliciesComponent implements OnInit {
                 this.notificationService.show(`Coverage amount cannot exceed ${policy.maxCoverageAmount}`, 'error');
                 return;
             }
+            // if (this.coverageError()) {
+            //     this.notificationService.show(this.coverageError()!, 'error');
+            //     return;
+            // }
+
             this.policyAppService.createApplication({
                 userId: user.id,
                 planId: policy.id!,

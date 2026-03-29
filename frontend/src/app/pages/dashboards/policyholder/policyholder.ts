@@ -25,15 +25,16 @@ export class PolicyholderComponent {
 
   constructor() {
     // Detect when we navigate to/from the policies page
-    this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe((e: NavigationEnd) => {
-        const onPolicies = e.urlAfterRedirects.includes('/policyholder/policies');
+    this.router.events //it runs only when navigation happens
+      .pipe(filter(e => e instanceof NavigationEnd)) // router emitted event after redirecting to correct url - it shows final resolved url
+      //navigationstart shows the user requested url before angular applies routing logic
+      .subscribe((e: NavigationEnd) => { //detcts when user move between pages
+        const onPolicies = e.urlAfterRedirects.includes('/policyholder/policies'); //gives final url after all redirects 
         this.isOnPoliciesPage.set(onPolicies);
         if (!onPolicies) {
           // Reset search when leaving the policies page
           this.navSearchQuery.set('');
-          this.policySearchService.reset();
+          this.policySearchService.reset(); //clears global search query
         }
       });
 
@@ -42,6 +43,7 @@ export class PolicyholderComponent {
     this.isOnPoliciesPage.set(url.includes('/policyholder/policies'));
   }
 
+  //when some words are typed in search bar it is called
   onNavSearch(query: string) {
     this.navSearchQuery.set(query);
     this.policySearchService.setQuery(query);
