@@ -1,0 +1,343 @@
+<div class="flex flex-col gap-6 w-full max-w-7xl mx-auto p-4 animate-in fade-in duration-500">
+    <!-- Header -->
+    <!-- <div -->
+    <!-- class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row gap-6 items-center justify-between"> -->
+    <!-- <div>
+            <h1 class="text-2xl font-black text-burgundy tracking-tight">Pending Approval</h1>
+            <p class="text-xs text-slate-500 font-bold uppercase mt-1">Review policy applications and top-up requests
+            </p>
+        </div> -->
+    <!-- <div class="flex items-center gap-4">
+            <div class="bg-burgundy/5 px-4 py-2 rounded-xl border border-burgundy/10 text-center">
+                <span class="block text-[10px] font-black uppercase text-burgundy/60 tracking-widest">Total
+                    Pending</span>
+                <span class="text-lg font-black text-burgundy">{{ pendingCount() }} items</span>
+            </div>
+        </div> -->
+    <!-- </div> -->
+
+    <!-- content table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-slate-50 border-b border-slate-100">
+                    <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">Applicant /
+                        Business</th>
+                    <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">Policy Details
+                    </th>
+                    <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">Coverage &
+                        Premium</th>
+                    <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">Status</th>
+                    <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50">
+                @for (req of requests(); track req.id) {
+                <tr class="hover:bg-slate-50/50 transition-colors group">
+                    <td class="px-6 py-5">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-black text-slate-700">{{ req.businessName }}</span>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">ID: {{
+                                req.policyNumber }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold text-slate-600">Plan ID: {{ req.planId }}</span>
+                            <span class="text-[10px] font-black text-burgundy/60 uppercase tracking-widest">{{
+                                req.paymentPlan }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-slate-500">Cov: {{ req.selectedCoverageAmount | currency
+                                }}</span>
+                            <span class="text-sm font-black text-burgundy">Premium: {{ req.premiumAmount | currency
+                                }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <span class="px-2.5 py-1 text-[10px] font-black uppercase rounded-lg"
+                            [ngClass]="req.status === 'SUBMITTED' ? 'bg-sky-100 text-sky-600' : 'bg-slate-100 text-slate-600'">
+                            {{ req.status }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-5 whitespace-nowrap">
+                        @if (req.status === 'APPROVED' || req.status === 'ACTIVE') {
+                        <span
+                            class="px-5 py-2.5 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase rounded-xl border border-emerald-100 flex items-center justify-center gap-2">
+                            <span class="text-emerald-500"></span> Approved
+                        </span>
+                        } @else if (req.status === 'REJECTED') {
+                        <span
+                            class="px-5 py-2.5 bg-rose-50 text-rose-600 text-[10px] font-black uppercase rounded-xl border border-rose-100 flex items-center justify-center gap-2">
+                            <span class="text-rose-500">✕</span> Rejected
+                        </span>
+                        } @else {
+                        <button (click)="openReview(req)"
+                            class="w-full px-4 py-2.5 bg-burgundy text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-burgundy/90 transition-all shadow-md shadow-burgundy/20 hover:scale-[1.02] active:scale-95">
+                            Review Request
+                        </button>
+                        }
+                    </td>
+                </tr>
+                }
+
+                @for (tp of topupRequests(); track tp.id) {
+                <tr class="hover:bg-amber-50/20 transition-colors group">
+                    <td class="px-6 py-5">
+                        <div class="flex flex-col">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-sm font-black text-slate-700">{{ tp.businessName ||
+                                    tp.requestedByUserName }}</span>
+                                <span
+                                    class="px-1.5 py-0.5 bg-amber-500 text-white text-[8px] font-black uppercase rounded shadow-sm shadow-amber-500/20">TOP-UP</span>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Policy: {{
+                                tp.policyNumber }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold text-slate-600">Plan ID: {{ tp.planId }}</span>
+                            <span class="text-[10px] font-black text-amber-600/60 uppercase tracking-widest">{{
+                                tp.paymentPlan }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-slate-500">Cov: {{ tp.totalCoverage | currency:'INR'
+                                }}</span>
+                            <span class="text-sm font-black text-amber-600">Prem: {{ tp.currentPremium | currency:'INR'
+                                }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <span class="px-2.5 py-1 text-[10px] font-black uppercase rounded-lg"
+                            [ngClass]="tp.policyStatus === 'ACTIVE' ? 'bg-slate-100 text-slate-600' : 'bg-slate-100 text-slate-600'">
+                            {{ tp.policyStatus }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-5 whitespace-nowrap">
+                        @if (tp.status === 'AGENT_APPROVED' || tp.status === 'APPROVED') {
+                        <div class="flex flex-col gap-1">
+                            <span
+                                class="px-4 py-2 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase rounded-xl border border-emerald-100 flex items-center justify-center gap-2">
+                                <span class="text-emerald-500"></span> Approved
+                            </span>
+                            @if (tp.status === 'AGENT_APPROVED') {
+                            <span
+                                class="text-[8px] font-bold text-emerald-500/80 uppercase text-center tracking-tighter">Waiting
+                                for Payment</span>
+                            }
+                        </div>
+                        } @else if (tp.status === 'REJECTED') {
+                        <span
+                            class="px-4 py-2 bg-rose-50 text-rose-600 text-[10px] font-black uppercase rounded-xl border border-rose-100 flex items-center justify-center gap-2">
+                            <span class="text-rose-500">✕</span> Rejected
+                        </span>
+                        } @else {
+                        <button (click)="openTopUpReview(tp)"
+                            class="w-full px-4 py-2.5 bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-amber-600 transition-all shadow-md shadow-amber-500/20 hover:scale-[1.02] active:scale-95">
+                            Review Top-Up
+                        </button>
+                        }
+                    </td>
+                </tr>
+                }
+
+                @if (requests().length === 0 && topupRequests().length === 0) {
+                <tr>
+                    <td colspan="5" class="px-6 py-20 text-center">
+                        <div class="flex flex-col items-center gap-3">
+                            <span class="text-4xl grayscale opacity-30"></span>
+                            <p class="text-slate-500 font-bold uppercase text-xs tracking-widest">No pending
+                                applications or top-ups</p>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Review Application Modal -->
+@if (selectedReq()) {
+<div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div
+        class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-burgundy/5">
+            <div>
+                <h2 class="text-xl font-black text-burgundy tracking-tight">Review Application</h2>
+                <p class="text-xs text-slate-500 font-bold mt-1">{{ selectedReq()?.businessName }}</p>
+            </div>
+            <button (click)="closeReview()"
+                class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
+                <span class="text-2xl leading-none">×</span>
+            </button>
+        </div>
+
+        <div class="px-8 py-8 flex-1 overflow-y-auto space-y-8">
+            <!-- Business Profile details -->
+            <div class="space-y-4">
+                <h4
+                    class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">
+                    Business Profile</h4>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-1">
+                        <span class="block text-[8px] font-black text-slate-400 uppercase">Industry</span>
+                        <span class="text-sm font-bold text-slate-700">{{ selectedReq()?.industry || 'N/A' }}</span>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="block text-[8px] font-black text-slate-400 uppercase">Employee Count</span>
+                        <span class="text-sm font-bold text-slate-700">{{ selectedReq()?.employeeCount }}
+                            Employees</span>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="block text-[8px] font-black text-slate-400 uppercase">Annual Revenue</span>
+                        <span class="text-sm font-bold text-slate-700">{{ selectedReq()?.annualRevenue | currency
+                            }}</span>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="block text-[8px] font-black text-slate-400 uppercase">Payment Plan</span>
+                        <span class="text-sm font-black text-burgundy">{{ selectedReq()?.paymentPlan }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GL Specific Details -->
+            @if (selectedReq()?.glDetail; as gl) {
+            <div class="space-y-4 p-5 bg-burgundy/5 rounded-2xl border border-burgundy/10">
+                <h4
+                    class="text-[10px] font-black text-burgundy uppercase tracking-widest border-b border-burgundy/10 pb-2">
+                    🛡️ General Liability Risk Details</h4>
+                <div class="grid grid-cols-2 gap-x-8 gap-y-4">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 font-bold">Premises Visits:</span>
+                        <span class="font-black text-slate-700">{{ gl.customersVisitPremises ? 'Yes' : 'No' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 font-bold">Daily Visitors:</span>
+                        <span class="font-black text-slate-700">{{ gl.dailyVisitorsRange || 'None' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 font-bold">Sells Products:</span>
+                        <span class="font-black text-slate-700">{{ gl.sellPhysicalProducts ? 'Yes' : 'No' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 font-bold">Work at Sites:</span>
+                        <span class="font-black text-slate-700">{{ gl.workAtCustomerSites ? 'Yes' : 'No' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 font-bold">Prior Claims:</span>
+                        <span class="font-black text-slate-700">{{ gl.hasPriorClaims ? 'Yes' : 'No' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 font-bold">Occurrence Limit:</span>
+                        <span class="font-black text-burgundy">{{ gl.perOccurrenceLimit | currency }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 font-bold">Aggregate Limit:</span>
+                        <span class="font-black text-burgundy">{{ gl.aggregateLimit | currency }}</span>
+                    </div>
+                </div>
+            </div>
+            }
+
+            @if (isRejecting()) {
+            <div class="space-y-3">
+                <label class="block text-xs font-black text-rose-600 uppercase tracking-widest">Reason for
+                    Rejection</label>
+                <textarea [(ngModel)]="rejectionReason" placeholder="Please provide a clear reason..."
+                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-700 text-sm h-24 resize-none"></textarea>
+            </div>
+            }
+        </div>
+
+        <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+            @if (!isRejecting()) {
+            <button (click)="isRejecting.set(true)"
+                class="px-6 py-2.5 text-rose-600 font-bold text-sm hover:bg-rose-50 rounded-xl transition-colors">Reject</button>
+            <button (click)="approve()"
+                class="px-8 py-2.5 bg-emerald-500 text-white font-black text-sm rounded-xl hover:bg-emerald-600 transition-all shadow-md shadow-emerald-500/20">Approve
+                Application</button>
+            } @else {
+            <button (click)="isRejecting.set(false)"
+                class="px-6 py-2.5 text-slate-600 font-bold text-sm hover:bg-slate-200/50 rounded-xl transition-colors">Back</button>
+            <button (click)="confirmReject()" [disabled]="!rejectionReason"
+                class="px-8 py-2.5 bg-rose-600 text-white font-black text-sm rounded-xl hover:bg-rose-700 transition-all shadow-md shadow-rose-600/20 disabled:opacity-50">Confirm
+                Rejection</button>
+            }
+        </div>
+    </div>
+</div>
+}
+
+<!-- Review Top-Up Modal -->
+@if (selectedTopUp()) {
+<div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div
+        class="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        <div class="px-8 py-6 border-b border-amber-100 flex items-center justify-between bg-amber-50">
+            <div>
+                <h2 class="text-xl font-black text-amber-800 tracking-tight">Review Top-Up Request</h2>
+                <p class="text-xs text-slate-500 font-bold mt-1">Policy: {{ selectedTopUp()?.policyNumber }}</p>
+            </div>
+            <button (click)="closeReview()"
+                class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
+                <span class="text-2xl leading-none">×</span>
+            </button>
+        </div>
+
+        <div class="px-8 py-8 flex-1 overflow-y-auto space-y-8">
+            <div class="p-6 bg-amber-50 rounded-2xl border border-amber-100 space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-amber-200/50">
+                    <span class="text-[10px] font-black text-slate-400 uppercase">Coverage Increase</span>
+                    <span class="text-sm font-black text-amber-600">+ {{ selectedTopUp()?.topUpAmount | currency:'INR'
+                        }}</span>
+                </div>
+                <div class="flex justify-between items-center pb-3 border-b border-amber-200/50">
+                    <span class="text-[10px] font-black text-slate-400 uppercase">One-time Premium Due</span>
+                    <span class="text-sm font-black text-burgundy">{{ selectedTopUp()?.additionalPremium |
+                        currency:'INR' }}</span>
+                </div>
+                <div class="flex justify-between items-center px-3 py-2 bg-white rounded-xl border border-amber-200/50">
+                    <span class="text-[10px] font-black text-slate-400 uppercase">Monthly Premium</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-black text-amber-700">{{ selectedTopUp()?.currentPremium |
+                            currency:'INR' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            @if (isRejecting()) {
+            <div class="space-y-3">
+                <label class="block text-xs font-black text-rose-600 uppercase tracking-widest">Reason for
+                    Rejection</label>
+                <textarea [(ngModel)]="rejectionReason" placeholder="Please provide a clear reason..."
+                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-700 text-sm h-24 resize-none"></textarea>
+            </div>
+            }
+        </div>
+
+        <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+            @if (!isRejecting()) {
+            <button (click)="isRejecting.set(true)"
+                class="px-6 py-2.5 text-rose-600 font-bold text-sm hover:bg-rose-50 rounded-xl transition-colors">Reject</button>
+            <button (click)="approve()"
+                class="px-8 py-2.5 bg-amber-500 text-white font-black text-sm rounded-xl hover:bg-amber-600 transition-all shadow-md shadow-amber-500/20">Approve
+                Top-Up</button>
+            } @else {
+            <button (click)="isRejecting.set(false)"
+                class="px-6 py-2.5 text-slate-600 font-bold text-sm hover:bg-slate-200/50 rounded-xl transition-colors">Back</button>
+            <button (click)="confirmReject()" [disabled]="!rejectionReason"
+                class="px-8 py-2.5 bg-rose-600 text-white font-black text-sm rounded-xl hover:bg-rose-700 transition-all shadow-md shadow-rose-600/20 disabled:opacity-50">Confirm
+                Rejection</button>
+            }
+        </div>
+    </div>
+</div>
+}

@@ -1,0 +1,213 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h2>{{ getTitle() }}</h2>
+    </div>
+
+    @if (loginSection === 'choice') {
+    <div class="choice-container auth-form">
+      <button class="btn btn-primary auth-btn" (click)="selectLoginType('admin')">Admin Login</button>
+      <button class="btn auth-btn"
+        style="margin-top: 1rem; background: transparent; color: var(--primary-burgundy); border: 1px solid var(--primary-burgundy);"
+        (click)="selectLoginType('user')">User Login</button>
+    </div>
+
+    }
+
+    @if (loginSection === 'login') {
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-form">
+      @if (loginType === 'user') {
+      <div class="form-group">
+        <label for="role">Access Role</label>
+        <select id="role" formControlName="role" class="form-control"
+          [ngClass]="{'is-invalid': loginForm.get('role')?.touched && loginForm.get('role')?.invalid}">
+          <option value="" disabled selected>Select your role</option>
+          @for (role of userRoles; track role) {
+          <option [value]="role.value">{{ role.label }}</option>
+          }
+        </select>
+        @if (loginForm.get('role')?.touched && loginForm.get('role')?.invalid) {
+        <div class="error-msg">
+          Please select a role
+        </div>
+        }
+      </div>
+      }
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" formControlName="email" placeholder="name@company.com" class="form-control"
+          [ngClass]="{'is-invalid': loginForm.get('email')?.touched && loginForm.get('email')?.invalid}">
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
+        <div class="error-msg">
+          Valid email is required
+        </div>
+        }
+
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-wrapper">
+          <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password"
+            placeholder="••••••••" class="form-control"
+            [ngClass]="{'is-invalid': loginForm.get('password')?.touched && loginForm.get('password')?.invalid}">
+          <button type="button" class="eye-toggle" (click)="togglePassword()"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+            @if (!showPassword) {
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            }
+            @if (showPassword) {
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+              <line x1="1" y1="1" x2="23" y2="23" />
+            </svg>
+            }
+          </button>
+        </div>
+        @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+        <div class="error-msg">
+          Password is required
+        </div>
+        }
+      </div>
+
+      <div class="recaptcha-box" [class.verified]="loginForm.get('recaptcha')?.value">
+        @if (!loginForm.get('recaptcha')?.value) {
+        <div class="recaptcha-content" (click)="handleRecaptcha()">
+          <div class="checkbox-container">
+            @if (isRecaptchaLoading) {
+            <div class="spinner"></div>
+            }
+            @if (!isRecaptchaLoading) {
+            <div class="checkbox"></div>
+            }
+          </div>
+          <span>I'm not a robot</span>
+          <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="recaptcha">
+        </div>
+        }
+        @if (loginForm.get('recaptcha')?.value) {
+        <div class="recaptcha-verified">
+          <!-- <span class="check-icon">✓</span> -->
+          <span>Verification Successful</span>
+        </div>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary auth-btn">
+        {{ loginForm.invalid ? 'Complete Form' : 'Login' }}
+      </button>
+
+      @if (loginType === 'user') {
+      <div style="text-align: center; margin-top: 0.5rem;">
+        <a href="javascript:void(0)" (click)="loginSection = 'forgot'"
+          style="color: var(--primary-burgundy); text-decoration: underline; font-size: 0.9rem;">Forgot Password?</a>
+      </div>
+      }
+      <div style="text-align: center; margin-top: 1rem;">
+        <a href="javascript:void(0)" (click)="backToChoice()"
+          style="color: var(--text-secondary); text-decoration: underline; font-size: 0.9rem;">Back</a>
+      </div>
+    </form>
+    }
+
+    @if (loginSection === 'forgot') {
+    <form [formGroup]="forgotForm" (ngSubmit)="onForgotPassword()" class="auth-form">
+      <div class="form-group">
+        <label for="forgot-email">Email Address</label>
+        <input type="email" id="forgot-email" formControlName="email" placeholder="name@company.com"
+          class="form-control"
+          [ngClass]="{'is-invalid': forgotForm.get('email')?.touched && forgotForm.get('email')?.invalid}">
+        @if (forgotForm.get('email')?.touched && forgotForm.get('email')?.invalid) {
+        <div class="error-msg">Valid email is required</div>
+        }
+      </div>
+      <button type="submit" class="btn btn-primary auth-btn">Send OTP</button>
+      <div style="text-align: center; margin-top: 1rem;">
+        <a href="javascript:void(0)" (click)="backToLogin()"
+          style="color: var(--text-secondary); text-decoration: underline; font-size: 0.9rem;">Back to Login</a>
+      </div>
+    </form>
+    }
+
+    @if (loginSection === 'reset') {
+    <form [formGroup]="resetForm" (ngSubmit)="onResetPassword()" class="auth-form">
+      <div class="form-group">
+        <label for="otp">OTP</label>
+        <input type="text" id="otp" formControlName="otp" placeholder="Enter OTP" class="form-control"
+          [ngClass]="{'is-invalid': resetForm.get('otp')?.touched && resetForm.get('otp')?.invalid}">
+      </div>
+      <div class="form-group">
+        <label for="newPassword">New Password</label>
+        <div class="password-wrapper">
+          <input [type]="showNewPassword ? 'text' : 'password'" id="newPassword" formControlName="newPassword"
+            placeholder="New Password" class="form-control"
+            [ngClass]="{'is-invalid': resetForm.get('newPassword')?.touched && resetForm.get('newPassword')?.invalid}">
+          <button type="button" class="eye-toggle" (click)="showNewPassword = !showNewPassword"
+            [attr.aria-label]="showNewPassword ? 'Hide password' : 'Show password'">
+            @if (!showNewPassword) {
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            }
+            @if (showNewPassword) {
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+              <line x1="1" y1="1" x2="23" y2="23" />
+            </svg>
+            }
+          </button>
+        </div>
+        @if (resetForm.get('newPassword')?.touched && resetForm.get('newPassword')?.errors?.['required']) {
+        <div class="error-msg">Password is required</div>
+        }
+        @if (resetForm.get('newPassword')?.touched && resetForm.get('newPassword')?.errors?.['strongPassword']) {
+        <div class="error-msg">Password must be at least 8 chars, include letters, numbers & special characters</div>
+        }
+      </div>
+      <div class="form-group">
+        <label for="confirmNewPassword">Confirm New Password</label>
+        <div class="password-wrapper">
+          <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmNewPassword"
+            formControlName="confirmNewPassword" placeholder="Confirm New Password" class="form-control"
+            [ngClass]="{'is-invalid': resetForm.get('confirmNewPassword')?.touched && resetForm.get('confirmNewPassword')?.invalid}">
+          <button type="button" class="eye-toggle" (click)="showConfirmPassword = !showConfirmPassword"
+            [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'">
+            @if (!showConfirmPassword) {
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            }
+            @if (showConfirmPassword) {
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+              <line x1="1" y1="1" x2="23" y2="23" />
+            </svg>
+            }
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary auth-btn">Reset Password</button>
+    </form>
+    }
+
+    <div class="auth-footer">
+      <p>Are you a new user? <a routerLink="/register">Register here</a></p>
+    </div>
+  </div>
+</div>

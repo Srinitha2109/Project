@@ -1,0 +1,329 @@
+<div class="gl-app-container">
+  <div class="header">
+    <h2>Apply for General Liability</h2>
+    <p>Complete the application steps to receive a customized quote.</p>
+  </div>
+
+  <!-- Progress Tracker (Stepper) -->
+  <div class="stepper">
+    <div class="step" [class.active]="currentStep() >= 1" [class.completed]="currentStep() > 1">
+      <div class="circle">1</div>
+      <span class="label">Basic Details</span>
+    </div>
+    <div class="line" [class.completed]="currentStep() > 1"></div>
+    <div class="step" [class.active]="currentStep() >= 2" [class.completed]="currentStep() > 2">
+      <div class="circle">2</div>
+      <span class="label">GL Specific Questions</span>
+    </div>
+    <div class="line" [class.completed]="currentStep() > 2"></div>
+    <div class="step" [class.active]="currentStep() >= 3">
+      <div class="circle">3</div>
+      <span class="label">Review & Confirm</span>
+    </div>
+  </div>
+
+  @if (policy(); as p) {
+    <div class="form-card">
+      <!-- STEP 1: Basic Details -->
+      @if (currentStep() === 1) {
+        <div [formGroup]="step1Form">
+          <h3 class="section-title">Step 1: Policy Basics</h3>
+          <!-- Policy Description Card -->
+          <div class="policy-info-card">
+            <h4>{{ p.policyName }}</h4>
+            <p class="description">{{ p.description }}</p>
+            <div class="policy-meta">
+              <span class="meta-item"><i class="fas fa-clock"></i> Duration: {{ p.durationMonths }} Months</span>
+              <span class="meta-item"><i class="fas fa-shield-alt"></i> Coverage: {{ p.insuranceTypeDisplayName ||
+            p.insuranceType }}</span>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Coverage Amount (₹)</label>
+            <input type="number" formControlName="selectedCoverageAmount" class="input-ctrl"
+              [min]="p.minCoverageAmount || 0" [max]="p.maxCoverageAmount || 99999999">
+            <p class="hint">Min: {{ p.minCoverageAmount | currency:'INR':'symbol':'1.0-2' }} | Max: {{
+              p.maxCoverageAmount | currency:'INR':'symbol':'1.0-2'
+            }}</p>
+          </div>
+          <div class="field">
+            <label>Payment Plan</label>
+            <select formControlName="paymentPlan" class="input-ctrl"
+              [ngClass]="{'is-invalid': (step1Form.get('paymentPlan')?.touched || formSubmitted()) && step1Form.get('paymentPlan')?.invalid}">
+              <option value="" disabled selected>Select Payment Plan</option>
+              <option value="MONTHLY">Monthly</option>
+              <option value="SIX_MONTHS">6 Months</option>
+              <option value="ANNUALLY">Annually</option>
+            </select>
+            @if ((step1Form.get('paymentPlan')?.touched || formSubmitted()) && step1Form.get('paymentPlan')?.invalid) {
+              <p class="error-msg"
+                >
+                Please select a payment plan before proceeding.
+              </p>
+            }
+          </div>
+        </div>
+        @if (calculatedPremium(); as cp) {
+          <div class="premium-box">
+            <span class="label">Estimated Premium:</span>
+            <span class="amt">{{ cp | currency:'INR':'symbol':'1.0-2' }}</span>
+            <!-- <span class="plan">/ {{ step1Form.value.paymentPlan | lowercase }}</span> -->
+          </div>
+        }
+        <div class="actions">
+          <button routerLink="/policyholder/policies" class="btn btn-outline">Cancel</button>
+          <button (click)="nextStep()" class="btn btn-primary">Next</button>
+        </div>
+      </div>
+    }
+    <!-- STEP 2: GL Specific Questions -->
+    @if (currentStep() === 2) {
+      <div [formGroup]="step2Form" class="step-questions">
+        <h3 class="section-title">Step 2: Business Risk Assessment</h3>
+        <p class="step-desc">Answer these questions to help us understand your specific risk profile. Your premium
+        updates in real-time.</p>
+        <!-- Section A: Premises -->
+        <div class="form-section-card">
+          <div class="section-header">
+            <i class="fas fa-building"></i>
+            <h4>Premises Information</h4>
+          </div>
+          <div class="section-body">
+            <div class="field-check">
+              <label>Do customers visit your premises?</label>
+              <div class="radio-group">
+                <label><input type="radio" [value]="true" formControlName="customersVisitPremises">
+                Yes</label>
+                <label><input type="radio" [value]="false" formControlName="customersVisitPremises">
+                No</label>
+              </div>
+            </div>
+            @if (step2Form.value.customersVisitPremises) {
+              <div class="sub-fields-modern">
+                <div class="field">
+                  <label>Average daily visitors?</label>
+                  <select formControlName="dailyVisitorsRange" class="input-ctrl">
+                    <option value="" disabled selected>Select visitor range</option>
+                    <option value="Less than 50">Less than 50</option>
+                    <option value="Between 50 and 200">Between 50 and 200</option>
+                    <option value="More than 200">More than 200</option>
+                  </select>
+                </div>
+                <div class="field-check mt-3">
+                  <label>Do customers use your parking lot?</label>
+                  <div class="radio-group">
+                    <label><input type="radio" [value]="true" formControlName="hasParkingLot"> Yes</label>
+                    <label><input type="radio" [value]="false" formControlName="hasParkingLot"> No</label>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+        <!-- Section B: Products -->
+        <div class="form-section-card">
+          <div class="section-header">
+            <i class="fas fa-box"></i>
+            <h4>Products</h4>
+          </div>
+          <div class="section-body">
+            <div class="field-check">
+              <label>Do you manufacture or sell physical products?</label>
+              <div class="radio-group">
+                <label><input type="radio" [value]="true" formControlName="sellPhysicalProducts">
+                Yes</label>
+                <label><input type="radio" [value]="false" formControlName="sellPhysicalProducts">
+                No</label>
+              </div>
+            </div>
+            @if (step2Form.value.sellPhysicalProducts) {
+              <div class="sub-fields-modern">
+                <div class="grid-2">
+                  <div class="field-check">
+                    <label>Do products contact food/beverages?</label>
+                    <div class="radio-group">
+                      <label><input type="radio" [value]="true" formControlName="productsContactFood">
+                      Yes</label>
+                      <label><input type="radio" [value]="false" formControlName="productsContactFood">
+                      No</label>
+                    </div>
+                  </div>
+                  <div class="field-check">
+                    <label>Are products designed for children?</label>
+                    <div class="radio-group">
+                      <label><input type="radio" [value]="true" formControlName="productsForChildren">
+                      Yes</label>
+                      <label><input type="radio" [value]="false" formControlName="productsForChildren">
+                      No</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+        <!-- Section C: Locations -->
+        <div class="form-section-card">
+          <div class="section-header">
+            <i class="fas fa-map-marker-alt"></i>
+            <h4>Work at Customer Locations</h4>
+          </div>
+          <div class="section-body">
+            <div class="field-check">
+              <label>Do you work at customer locations?</label>
+              <div class="radio-group">
+                <label><input type="radio" [value]="true" formControlName="workAtCustomerSites"> Yes</label>
+                <label><input type="radio" [value]="false" formControlName="workAtCustomerSites"> No</label>
+              </div>
+            </div>
+            @if (step2Form.value.workAtCustomerSites) {
+              <div class="sub-fields-modern">
+                <div class="field-check">
+                  <label>Does your work remain after completion? (e.g. building, wiring)</label>
+                  <div class="radio-group">
+                    <label><input type="radio" [value]="true" formControlName="workRemainsAfterCompletion">
+                    Yes</label>
+                    <label><input type="radio" [value]="false" formControlName="workRemainsAfterCompletion">
+                    No</label>
+                  </div>
+                </div>
+                <div class="field-check mt-3">
+                  <label>Do you use subcontractors?</label>
+                  <div class="radio-group">
+                    <label><input type="radio" [value]="true" formControlName="useSubcontractors">
+                    Yes</label>
+                    <label><input type="radio" [value]="false" formControlName="useSubcontractors">
+                    No</label>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+        <!-- Section D: Claims -->
+        <div class="form-section-card">
+          <div class="section-header">
+            <i class="fas fa-history"></i>
+            <h4>Claims History (Last 3 Years)</h4>
+          </div>
+          <div class="section-body">
+            <div class="field-check">
+              <label>Have you had any liability claims?</label>
+              <div class="radio-group">
+                <label><input type="radio" [value]="true" formControlName="hasPriorClaims"> Yes</label>
+                <label><input type="radio" [value]="false" formControlName="hasPriorClaims"> No</label>
+              </div>
+            </div>
+            @if (step2Form.value.hasPriorClaims) {
+              <div class="sub-fields-modern">
+                <div class="form-grid">
+                  <div class="field">
+                    <label>Total number of claims</label>
+                    <input type="number" formControlName="claimsCount" class="input-ctrl">
+                  </div>
+                  <div class="field">
+                    <label>Total amount paid on claims (₹)</label>
+                    <input type="number" formControlName="totalClaimsAmount" class="input-ctrl">
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+        <!-- Section E: Coverage Selection -->
+        <div class="form-section-card">
+          <div class="section-header">
+            <i class="fas fa-shield-alt"></i>
+            <h4>Coverage Details</h4>
+          </div>
+          <div class="section-body">
+            <div class="form-grid">
+              <div class="field">
+                <label>Coverage type needed?</label>
+                <select formControlName="coverageType" class="input-ctrl">
+                  <option value="BI">Bodily Injury Only</option>
+                  <option value="PD">Property Damage Only</option>
+                  <option value="Both">Both Bodily Injury & Property Damage</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid-2 mt-4">
+              <div class="field-check">
+                <label class="checkbox-label">
+                  <input type="checkbox" formControlName="includeProductsCompletedOps">
+                  <span>Include Products & Completed Ops</span>
+                </label>
+              </div>
+              <div class="field-check">
+                <label class="checkbox-label">
+                  <input type="checkbox" formControlName="includeAdvertisingInjury">
+                  <span>Include Advertising Injury</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <button (click)="prevStep()" class="btn btn-outline">Back</button>
+          <button (click)="nextStep()" [disabled]="!step2Form.valid" class="btn btn-primary">Review</button>
+        </div>
+      </div>
+    }
+    <!-- STEP 3: Review & Confirm -->
+    @if (currentStep() === 3) {
+      <div class="review-step">
+        <h3 class="section-title">Review Your GL Application</h3>
+        <div class="review-grid">
+          <!-- Group 1: General Info -->
+          <div class="review-card">
+            <h5>POLICY DETAILS</h5>
+            <div class="row"><span>Name:</span> <strong>{{ p.policyName }}</strong></div>
+            <div class="row"><span>Coverage Amt:</span> <strong>{{ step1Form.value.selectedCoverageAmount |
+          currency:'INR':'symbol':'1.0-2' }}</strong></div>
+          <div class="row"><span>Payment Plan:</span> <strong>{{ step1Form.value.paymentPlan }}</strong></div>
+        </div>
+        <!-- Group 2: Profile Info -->
+        @if (businessProfile(); as profile) {
+          <div class="review-card">
+            <h5>BUSINESS PROFILE</h5>
+            <div class="row"><span>Business:</span> <strong>{{ profile.businessName }}</strong></div>
+            <div class="row"><span>Industry:</span> <strong>{{ profile.industry }}</strong></div>
+            <div class="row"><span>Revenue:</span> <strong>{{ profile.annualRevenue |
+          currency:'INR':'symbol':'1.0-2' }}</strong></div>
+          <div class="row"><span>Employees:</span> <strong>{{ profile.employeeCount }}</strong></div>
+        </div>
+      }
+    </div>
+    <div class="gl-summary">
+      <h5>GL RISK DETAILS</h5>
+      <div class="summary-list">
+        <div class="sum-item"><span>Customers visit premises:</span> <strong>{{
+      step2Form.value.customersVisitPremises ? 'Yes' : 'No' }}</strong></div>
+      @if (step2Form.value.customersVisitPremises) {
+        <div class="sum-item"><span>Daily Visitors:</span>
+        <strong>{{ step2Form.value.dailyVisitorsRange }}</strong>
+      </div>
+    }
+    <div class="sum-item"><span>Sells physical products:</span> <strong>{{
+  step2Form.value.sellPhysicalProducts ? 'Yes' : 'No' }}</strong></div>
+  <div class="sum-item"><span>Works at customer sites:</span> <strong>{{
+step2Form.value.workAtCustomerSites ? 'Yes' : 'No' }}</strong></div>
+</div>
+</div>
+<div class="final-premium">
+  <h4>FINAL CALCULATED PREMIUM</h4>
+  <div class="total">{{ calculatedPremium() | currency:'INR':'symbol':'1.0-2' }}</div>
+  <!-- <div class="period">/ {{ step1Form.value.paymentPlan | lowercase }}</div> -->
+</div>
+<div class="actions">
+  <button (click)="prevStep()" class="btn btn-outline" [disabled]="isSubmitting()"> Edit</button>
+  <button (click)="submitApplication()" [disabled]="isSubmitting()" class="btn btn-primary" type="button">
+    {{ isSubmitting() ? 'Submitting...' : 'Submit for Review ' }}
+  </button>
+</div>
+</div>
+}
+</div>
+}
+</div>

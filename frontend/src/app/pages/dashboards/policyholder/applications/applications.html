@@ -1,0 +1,475 @@
+<div class="flex flex-col gap-6 w-full max-w-7xl mx-auto p-3 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-3 flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-black text-burgundy tracking-tight">My Applications</h1>
+            <p class="text-sm text-slate-500 font-bold  mt-1 tracking-tight">Track and manage your policy requests</p>
+        </div>
+        <div class="bg-burgundy/5 px-6 py-3 rounded-2xl border border-burgundy/10 shadow-sm">
+            <span class="text-sm font-black text-burgundy">{{ applications().length }} Total Applications</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        @for (app of applications(); track app.id) {
+        <div
+            class="bg-white rounded-xl border border-slate-100 shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col group">
+            <!-- Status Header — light burgundy -->
+            <div class="px-5 py-3 flex items-center justify-between" style=" border-bottom: 1px solid #C17B8C30;">
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-black uppercase tracking-widest" style="color: #8B1A3A;">{{
+                        app.policyNumber }}</span>
+                    @if (app.topUps && app.topUps.length > 0) {
+                    <span
+                        class="px-1.5 py-0.5 bg-amber-500 text-white text-[8px] font-black uppercase rounded shadow-sm shadow-amber-500/20">TOP-UP</span>
+                    }
+                </div>
+                <span class="px-2.5 py-0.5 text-[9px] font-black uppercase rounded-md"
+                    style="background: #C17B8C30; color: #8B1A3A;">{{ app.status }}</span>
+            </div>
+
+            <div class="p-5 flex-1 flex flex-col gap-4">
+                <!-- Plan Name -->
+                <div>
+                    <h3
+                        class="text-sm font-black text-slate-800 leading-tight uppercase tracking-tight group-hover:text-[#8B1A3A] transition-colors">
+                        {{ app.planName || 'Insurance Plan' }}
+                    </h3>
+                    <p class="text-[10px] font-semibold text-slate-400 uppercase mt-0.5">{{ app.paymentPlan }} Plan</p>
+                </div>
+
+                <!-- Coverage & Premium inline -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-[#F9F0F3] p-3 rounded-lg flex-1">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[8px] font-black uppercase text-[#8B1A3A]/50 tracking-widest">Coverage
+                                Balance</span>
+                            @if (getUsageStatus(app).percent > 0) {
+                            <span class="text-[8px] font-black uppercase" [ngClass]="getUsageStatus(app).textClass">
+                                {{ getUsageStatus(app).percent | number:'1.0-0' }}% USED
+                            </span>
+                            }
+                        </div>
+                        <span class="text-sm font-black text-[#8B1A3A]">{{ getRemainingBalance(app) | currency:'INR'
+                            }}</span>
+
+                        <!-- Usage Progress Bar -->
+                        <div class="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                            <div class="h-full transition-all duration-1000" [ngClass]="getUsageStatus(app).bgClass"
+                                [style.width.%]="getUsageStatus(app).percent">
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center mt-1">
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Used: {{
+                                app.totalSettledAmount || 0 | currency:'INR' }}</p>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Limit: {{
+                                (app.currentAggregateLimit || app.selectedCoverageAmount) | currency:'INR' }}</p>
+                        </div>
+                    </div>
+                    <div class="bg-[#F9F0F3] p-3 rounded-lg">
+                        <span
+                            class="block text-[8px] font-black uppercase text-[#8B1A3A]/50 tracking-widest mb-0.5">Premium</span>
+                        <span class="text-sm font-black text-[#8B1A3A]">{{ app.premiumAmount | currency:'INR' }}</span>
+                    </div>
+                </div>
+
+                <!-- Dates -->
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Expiry</span>
+                        <span class="text-[10px] font-bold text-slate-600">{{ (app.endDate | date:'mediumDate') || 'To
+                            be decided' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Next Due</span>
+                        <span class="text-[10px] font-bold text-slate-600">{{ app.nextPaymentDueDate ?
+                            (app.nextPaymentDueDate | date:'mediumDate') : 'Request Pending' }}</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col gap-2 mt-auto">
+                    @if (isPaymentRequired(app)) {
+                    <button (click)="payPremium(app)"
+                        class="w-full py-2.5 text-white text-xs font-black rounded-lg transition-all flex items-center justify-center gap-2"
+                        style="background: #8B1A3A;">
+                        Pay Premium
+                    </button>
+                    } @else if (app.status === 'ACTIVE') {
+                    <button
+                        class="w-full py-2.5 bg-emerald-50 text-emerald-600 border border-emerald-100 text-xs font-black rounded-lg flex items-center justify-center gap-2 cursor-default">
+                        Paid
+                    </button>
+                    @if (getRemainingBalance(app) > 0) {
+                    <div class="flex gap-2">
+                        <button (click)="openClaimModal(app)" [disabled]="hasPendingClaim(app)"
+                            class="flex-1 py-2.5 text-xs font-black rounded-lg flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            style="background: #C17B8C20; color: #8B1A3A; border: 1px solid #C17B8C40;"
+                            onmouseover="!hasPendingClaim(app) && (this.style.background='#8B1A3A'); !hasPendingClaim(app) && (this.style.color='white')"
+                            onmouseout="this.style.background='#C17B8C20'; this.style.color='#8B1A3A'">
+                            {{ hasPendingClaim(app) ? 'Active Claim Pending' : 'Raise Claim' }}
+                        </button>
+                        @if (canTopUp(app)) {
+                        <button (click)="openTopUpModal(app)"
+                            class="flex-1 py-2.5 text-xs font-black rounded-lg flex items-center justify-center gap-2 transition-all bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-500 hover:text-white animate-in zoom-in duration-300">
+                            Top-Up
+                        </button>
+                        }
+                    </div>
+                    } @else {
+                    <div class="flex flex-col gap-2">
+                        <div
+                            class="w-full py-2.5 bg-rose-50 border border-rose-100 text-rose-400 text-xs font-black rounded-lg flex items-center justify-center gap-2">
+                            Coverage Limit Reached
+                        </div>
+                        <button (click)="renewPolicy(app)"
+                            class="w-full py-2.5 bg-burgundy text-white text-xs font-black rounded-lg hover:bg-burgundy-dark transition-all shadow-md shadow-burgundy/20">
+                            Renew Policy Now
+                        </button>
+                    </div>
+                    }
+                    } @else if (app.status === 'REJECTED') {
+                    <div class="bg-rose-50 p-3 rounded-lg border border-rose-100">
+                        <span
+                            class="block text-[8px] font-black uppercase text-rose-400 mb-0.5 tracking-widest">Reason</span>
+                        <p class="text-[10px] font-semibold text-rose-600 italic leading-snug">"{{ app.rejectionReason
+                            || 'No reason provided' }}"</p>
+                    </div>
+                    } @else {
+                    <div
+                        class="flex items-center justify-center gap-2 py-2.5 bg-slate-50 rounded-lg border border-dashed border-slate-200">
+                        <div class="w-1.5 h-1.5 rounded-full bg-[#8B1A3A]/30 animate-bounce"
+                            style="animation-delay: 0ms"></div>
+                        <div class="w-1.5 h-1.5 rounded-full bg-[#8B1A3A]/50 animate-bounce"
+                            style="animation-delay: 150ms"></div>
+                        <div class="w-1.5 h-1.5 rounded-full bg-[#8B1A3A]/70 animate-bounce"
+                            style="animation-delay: 300ms"></div>
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Under Review</span>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+        } @empty {
+        <div
+            class="col-span-full py-20 flex flex-col items-center justify-center bg-white rounded-xl border-2 border-dashed border-slate-200 gap-4">
+            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-4xl opacity-50"></div>
+            <div class="text-center">
+                <h3 class="text-lg font-black text-slate-700 mb-1">No Applications</h3>
+                <p class="text-slate-400 text-xs font-semibold">Browse available policies to get started.</p>
+            </div>
+        </div>
+        }
+    </div>
+</div>
+
+<!-- Raise Claim Modal -->
+@if (showClaimModal()) {
+<div class="fixed inset-0 bg-slate-800/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    style="z-index: 9999;">
+    <div class="bg-white rounded-2xl w-full max-w-2xl shadow-xl overflow-y-auto max-h-[95vh] flex flex-col relative">
+        <!-- Modal Header -->
+        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-start">
+            <div>
+                <h2 class="text-xl font-black text-slate-800">Raise a Claim</h2>
+                <p class="text-xs text-slate-400 font-semibold mt-0.5">Application ID: <span
+                        class="font-black text-burgundy">#{{ selectedApp()?.id }}</span></p>
+            </div>
+            <button (click)="closeClaimModal()"
+                class="text-slate-400 hover:text-slate-600 transition-colors text-xl leading-none">✕</button>
+        </div>
+
+        <!-- Available Balance Banner -->
+        <div class="mx-8 mt-6 p-4 rounded-xl flex items-center justify-between"
+            [ngClass]="getAvailableBalance(selectedApp()!) > 0 ? 'bg-emerald-50 border border-emerald-100' : 'bg-rose-50 border border-rose-100'">
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-widest"
+                    [ngClass]="getAvailableBalance(selectedApp()!) > 0 ? 'text-emerald-500' : 'text-rose-400'">Coverage
+                    Balance Available</span>
+                <p class="text-base font-black mt-0.5"
+                    [ngClass]="getAvailableBalance(selectedApp()!) > 0 ? 'text-emerald-700' : 'text-rose-600'">
+                    {{ getAvailableBalance(selectedApp()!) | currency:'INR' }}
+                </p>
+            </div>
+            <div class="text-right">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Coverage Limit</span>
+                <p class="text-sm font-black text-slate-600">{{ selectedApp()?.selectedCoverageAmount | currency:'INR'
+                    }}</p>
+
+            </div>
+        </div>
+
+        <!-- Modal Stepper Header -->
+        <div class="px-8 py-4 bg-slate-50/50 border-b border-slate-100 flex items-center justify-center gap-8">
+            <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black"
+                    [ngClass]="currentStep() >= 1 ? 'bg-burgundy text-white' : 'bg-slate-200 text-slate-500'">1</span>
+                <span class="text-[9px] font-black uppercase tracking-widest"
+                    [ngClass]="currentStep() >= 1 ? 'text-slate-800' : 'text-slate-400'">Select Type</span>
+            </div>
+            <div class="w-8 h-px bg-slate-200"></div>
+            <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black"
+                    [ngClass]="currentStep() >= 2 ? 'bg-burgundy text-white' : 'bg-slate-200 text-slate-500'">2</span>
+                <span class="text-[9px] font-black uppercase tracking-widest"
+                    [ngClass]="currentStep() >= 2 ? 'text-slate-800' : 'text-slate-400'">Documents</span>
+            </div>
+            <div class="w-8 h-px bg-slate-200"></div>
+            <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black"
+                    [ngClass]="currentStep() >= 3 ? 'bg-burgundy text-white' : 'bg-slate-200 text-slate-500'">3</span>
+                <span class="text-[9px] font-black uppercase tracking-widest"
+                    [ngClass]="currentStep() >= 3 ? 'text-slate-800' : 'text-slate-400'">Review</span>
+            </div>
+        </div>
+
+        <div class="px-8 pt-6 pb-8 flex-1">
+            <!-- STEP 1: Select Type -->
+            @if (currentStep() === 1) {
+            <div class="space-y-6 py-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                <div class="text-center">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">My Policy</p>
+                    <h3 class="text-lg font-black text-slate-800 uppercase">{{ selectedApp()?.planName }}</h3>
+                </div>
+
+                @if (isGeneralLiability()) {
+                <div class="space-y-4">
+                    <p class="text-sm font-black text-slate-600 text-center">What happened?</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button (click)="selectSubtype('Bodily Injury')"
+                            class="p-6 rounded-2xl border-2 transition-all text-center flex flex-col items-center gap-3 group"
+                            [ngClass]="selectedSubtype() === 'Bodily Injury' ? 'border-burgundy bg-burgundy/5 shadow-md' : 'border-slate-100 hover:border-slate-200 bg-white'">
+
+                            <span class="text-xs font-black uppercase tracking-tight"
+                                [ngClass]="selectedSubtype() === 'Bodily Injury' ? 'text-burgundy' : 'text-slate-500'">Bodily
+                                Injury</span>
+                        </button>
+                        <button (click)="selectSubtype('Property Damage')"
+                            class="p-6 rounded-2xl border-2 transition-all text-center flex flex-col items-center gap-3 group"
+                            [ngClass]="selectedSubtype() === 'Property Damage' ? 'border-burgundy bg-burgundy/5 shadow-md' : 'border-slate-100 hover:border-slate-200 bg-white'">
+
+                            <span class="text-xs font-black uppercase tracking-tight"
+                                [ngClass]="selectedSubtype() === 'Property Damage' ? 'text-burgundy' : 'text-slate-500'">Property
+                                Damage</span>
+                        </button>
+                    </div>
+                </div>
+                } @else {
+                <div class="py-10 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 mt-4">
+                    <p class="text-sm font-black text-slate-500">Auto-detecting requirements for your policy...</p>
+                    <button (click)="goToStep2()"
+                        class="mt-4 px-8 py-3 bg-burgundy text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-burgundy/20">Proceed</button>
+                </div>
+                }
+
+                @if (isGeneralLiability() && selectedSubtype()) {
+                <button (click)="goToStep2()"
+                    class="w-full py-4 bg-burgundy text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-burgundy/20 animate-in zoom-in-95">Continue
+                    to Documents</button>
+                }
+            </div>
+            }
+
+            <!-- STEP 2: Upload Documents -->
+            @if (currentStep() === 2) {
+            <div class="space-y-6 py-2 animate-in fade-in slide-in-from-right-4 duration-300">
+                <div class="flex items-center justify-between">
+                    <button (click)="goToStep1()"
+                        class="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-burgundy">←
+                        Back</button>
+                    <h3 class="text-sm font-black text-slate-800 text-center">Upload Required Documents</h3>
+                    <div class="w-10"></div>
+                </div>
+
+                <p class="text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest">Our AI will
+                    automatically extract incident details</p>
+
+                <div class="space-y-4 max-h-[400px] overflow-y-auto px-1 pr-2">
+                    @for (doc of requiredDocs(); track doc) {
+                    <div
+                        class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm relative group hover:border-burgundy/20 transition-all">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-[11px] font-black text-slate-700 uppercase tracking-tight">{{ doc }}
+                                <span class="text-burgundy">*</span></label>
+                            @if (ocrErrors().includes(doc)) {
+                            <span
+                                class="text-[8px] font-black px-1.5 py-0.5 bg-rose-50 text-rose-500 rounded border border-rose-100">OCR
+                                ERROR</span>
+                            } @else if (uploadedDocs.has(doc)) {
+                            <span class="text-[10px]"></span>
+                            }
+                        </div>
+
+                        <div class="relative">
+                            @if (uploadedDocs.has(doc)) {
+                            <div
+                                class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                <div class="flex items-center gap-2 overflow-hidden">
+                                    <span class="text-xs">📄</span>
+                                    <span class="text-[10px] font-bold text-slate-600 truncate">{{
+                                        uploadedDocs.get(doc)?.name }}</span>
+                                </div>
+                                <button (click)="removeFile(doc)"
+                                    class="text-[9px] font-black text-slate-400 hover:text-rose-500 uppercase tracking-tighter">Change</button>
+                            </div>
+                            } @else {
+                            <div
+                                class="relative border-2 border-dashed border-slate-200 rounded-lg p-3 hover:bg-slate-50 transition-colors text-center">
+                                <input type="file" (change)="onSpecificFileSelected($event, doc)"
+                                    accept="application/pdf"
+                                    class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                                <span class="text-[9px] font-black text-slate-400 uppercase">Click to upload</span>
+                                <div class="mt-1 text-xs">↑</div>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+
+                <div class="pt-4 border-t border-slate-100">
+                    <button (click)="extractDataViaOCR()" [disabled]="!canProceedToStep3() || ocrLoading()"
+                        class="w-full py-4 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg transition-all disabled:opacity-50"
+                        [style.background]="'#8B1A3A'">
+                        {{ ocrLoading() ? 'Analyzing Documents...' : 'Continue to Review' }}
+                    </button>
+                    @if (!canProceedToStep3()) {
+                    <p class="text-[9px] font-bold text-slate-400 text-center mt-2 uppercase tracking-tighter">Please
+                        upload all mandatory documents to continue</p>
+                    }
+                </div>
+            </div>
+            }
+
+            <!-- STEP 3: Review & Edit -->
+            @if (currentStep() === 3) {
+            <div class="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                @if (ocrLoading()) {
+                <div class="py-20 flex flex-col items-center justify-center space-y-4">
+                    <div class="w-12 h-12 border-4 border-burgundy/20 border-t-burgundy rounded-full animate-rotate">
+                    </div>
+                    <div class="text-center">
+                        <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Scanning PDF Documents
+                        </h4>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-1">AI core is
+                            extracting fields for your claim...</p>
+                    </div>
+                </div>
+                } @else {
+                <div class="flex items-center justify-between mb-2">
+                    <button (click)="goToStep2()"
+                        class="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-burgundy">←
+                        Back</button>
+                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">Review Extracted Data</h3>
+                    <div class="w-10"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Incident
+                            Date</label>
+                        <input type="date" [(ngModel)]="claimForm.incidentDate"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm text-slate-700 outline-none focus:ring-2 focus:ring-burgundy/10">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Location</label>
+                        <input type="text" [(ngModel)]="claimForm.incidentLocation"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm text-slate-700 outline-none focus:ring-2 focus:ring-burgundy/10">
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Incident
+                        Description</label>
+                    <textarea [(ngModel)]="claimForm.description" rows="3"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm text-slate-700 outline-none focus:ring-2 focus:ring-burgundy/10 resize-none"></textarea>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Claim Amount</label>
+                    <div class="relative group">
+                        <span
+                            class="absolute left-4 top-1/2 -translate-y-1/2 font-black transition-colors text-slate-400"
+                            [ngClass]="!isClaimAmountValid() ? 'text-rose-500' : 'text-slate-400'">₹</span>
+                        <input type="number" [(ngModel)]="claimForm.claimAmount"
+                            class="w-full pl-8 pr-4 py-4 bg-slate-50 border rounded-xl font-black text-lg outline-none transition-all"
+                            [ngClass]="!isClaimAmountValid() ? 'border-rose-500 text-rose-600 focus:ring-rose-500/10' : 'border-slate-200 text-burgundy focus:ring-burgundy/10'">
+                    </div>
+                    @if (!isClaimAmountValid()) {
+                    <p
+                        class="text-[10px] font-black text-rose-500 uppercase tracking-tighter mt-1 animate-in zoom-in duration-300">
+                        Claim amount should not exceed the available coverage balance
+                    </p>
+                    }
+                </div>
+
+                <div class="pt-4 flex gap-4">
+                    <button (click)="closeClaimModal()"
+                        class="flex-1 py-4 border border-slate-200 rounded-xl font-black text-xs uppercase tracking-widest text-slate-500 hover:bg-slate-50">Cancel</button>
+                    <button (click)="submitClaim()"
+                        [disabled]="isSubmitting() || claimForm.claimAmount <= 0 || !isClaimAmountValid()"
+                        class="flex-[2] py-4 bg-burgundy text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-burgundy/20 hover:opacity-90 disabled:opacity-50">
+                        {{ isSubmitting() ? 'Submitting...' : 'Confirm & Submit Claim' }}
+                    </button>
+                </div>
+                }
+            </div>
+            }
+        </div>
+    </div>
+</div>
+}
+
+<!-- Top-Up Request Modal -->
+@if (showTopUpModal()) {
+<div class="fixed inset-0 bg-slate-800/40 backdrop-blur-sm z-[10000] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-amber-50/50">
+            <div>
+                <h2 class="text-lg font-black text-amber-700">Policy Top-Up</h2>
+                <p class="text-[10px] font-bold text-amber-600 uppercase tracking-widest mt-0.5">Boost your claim
+                    balance</p>
+            </div>
+            <button (click)="closeTopUpModal()"
+                class="text-slate-400 hover:text-slate-600 transition-colors text-xl leading-none">✕</button>
+        </div>
+
+        <div class="p-6 space-y-4">
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2 text-slate-700">
+                <div class="flex justify-between text-[10px] font-black uppercase text-slate-400">
+                    <span>Limit</span>
+                    <span>{{ (selectedAppForTopUp()?.currentAggregateLimit ||
+                        selectedAppForTopUp()?.selectedCoverageAmount) | currency:'INR' }}</span>
+                </div>
+                <div class="flex justify-between text-[10px] font-black uppercase text-slate-400">
+                    <span>Used</span>
+                    <span>{{ selectedAppForTopUp()?.totalSettledAmount || 0 | currency:'INR' }}</span>
+                </div>
+                <div class="h-px bg-slate-200"></div>
+                <div class="flex justify-between text-xs font-black uppercase text-amber-700">
+                    <span>Remaining</span>
+                    <span>{{ getRemainingBalance(selectedAppForTopUp()) | currency:'INR' }}</span>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Top-Up Amount</label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-400">₹</span>
+                    <input type="number" [ngModel]="topUpAmount()" (ngModelChange)="topUpAmount.set($event)"
+                        class="w-full pl-8 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-xl font-black text-xl text-amber-600 focus:ring-2 focus:ring-amber-500/10 outline-none transition-all">
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-3">
+            <button (click)="closeTopUpModal()"
+                class="flex-1 py-3 text-xs font-black text-slate-500 uppercase tracking-widest hover:bg-slate-100 rounded-xl transition-all">Cancel</button>
+            <button (click)="submitTopUp()" [disabled]="isTopUpSubmitting() || topUpAmount() <= 0"
+                class="flex-[2] py-3 bg-amber-500 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all disabled:opacity-50">
+                Submit Request
+            </button>
+        </div>
+    </div>
+</div>
+}
