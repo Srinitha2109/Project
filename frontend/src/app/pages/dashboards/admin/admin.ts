@@ -15,10 +15,16 @@ export class AdminComponent {
   private router = inject(Router);
   currentUser = this.authService.currentUser;
 
-  isSidebarOpen = signal(true);
+  isSidebarOpen = signal(window.innerWidth >= 768);
 
   toggleSidebar() {
     this.isSidebarOpen.update(v => !v);
+  }
+
+  closeSidebarOnMobile() {
+    if (window.innerWidth < 768) {
+      this.isSidebarOpen.set(false);
+    }
   }
 
   getUserInitials(): string {

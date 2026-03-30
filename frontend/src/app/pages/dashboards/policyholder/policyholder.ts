@@ -18,7 +18,7 @@ export class PolicyholderComponent {
   private router = inject(Router);
   readonly policySearchService = inject(PolicySearchService);
 
-  isSidebarCollapsed = signal(false);
+  isSidebarCollapsed = signal(window.innerWidth < 768);
   isOnPoliciesPage = signal(false);
   navSearchQuery = signal('');
   currentUser = this.authService.currentUser;
@@ -51,6 +51,12 @@ export class PolicyholderComponent {
 
   toggleSidebar() {
     this.isSidebarCollapsed.set(!this.isSidebarCollapsed());
+  }
+
+  closeSidebarOnMobile() {
+    if (window.innerWidth < 768) {
+      this.isSidebarCollapsed.set(true);
+    }
   }
 
   getUserInitials(): string {

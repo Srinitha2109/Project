@@ -183,3 +183,47 @@ label {
     width: 20px;
     height: 20px;
 }
+
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 1.25rem 1rem;
+        min-height: calc(100vh - 120px);
+        align-items: flex-start;
+        padding-top: 2rem;
+    }
+
+    .auth-card {
+        padding: 2rem 1.5rem;
+        border-radius: 12px;
+        max-width: 100%;
+    }
+
+    .auth-header h2 {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 1rem 0.75rem;
+        min-height: 100vh;
+    }
+
+    .auth-card {
+        padding: 1.75rem 1.25rem;
+        border-radius: 10px;
+    }
+
+    .auth-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .auth-btn {
+        font-size: 1rem;
+        padding: 0.875rem;
+    }
+
+    .form-control {
+        font-size: 0.95rem;
+    }
+}

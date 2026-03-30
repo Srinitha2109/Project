@@ -133,4 +133,45 @@ a:hover {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
-}
+}
+
+/* ---- Global Mobile Responsiveness ---- */
+
+/* Prevent horizontal overflow on mobile */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Tables scroll horizontally on small screens */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* On mobile any overflow-x-auto table wrapper stays scrollable */
+@media (max-width: 768px) {
+  /* stack stat cards to 1 column */
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* give table containers horizontal scroll */
+  [class*="overflow-x-auto"] {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* reduce default card padding on mobile */
+  .card {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    padding: 0.65rem 1.1rem;
+    font-size: 0.9rem;
+  }
+}
+

@@ -13,11 +13,17 @@ import { NotificationBellComponent } from '../../../shared/notification-bell/not
 })
 export class AgentComponent {
   private authService = inject(AuthService);
-  isSidebarCollapsed = signal(false);
+  isSidebarCollapsed = signal(window.innerWidth < 768);
   currentUser = this.authService.currentUser;
 
   toggleSidebar() {
     this.isSidebarCollapsed.set(!this.isSidebarCollapsed());
+  }
+
+  closeSidebarOnMobile() {
+    if (window.innerWidth < 768) {
+      this.isSidebarCollapsed.set(true);
+    }
   }
 
   logout() {

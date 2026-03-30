@@ -193,3 +193,97 @@
         align-items: center;
     }
 }
+
+@media (max-width: 768px) {
+    .hero {
+        padding: 4rem 1.25rem;
+    }
+
+    .hero h1 {
+        font-size: 2.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+        margin: 0 auto 2.5rem;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .hero-actions .btn {
+        width: 100%;
+        max-width: 320px;
+        text-align: center;
+    }
+
+    .details {
+        padding: 2rem 1.25rem;
+    }
+
+    .section-header h2 {
+        font-size: 2rem;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .cta-banner {
+        padding: 2rem 1.25rem;
+    }
+
+    .cta-content {
+        padding: 3rem 1.5rem;
+        border-radius: 20px;
+    }
+
+    .cta-content h2 {
+        font-size: 1.75rem;
+    }
+
+    .cta-content p {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .cta-links {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .cta-links .btn {
+        width: 100%;
+        max-width: 280px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 1.75rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.6rem;
+    }
+
+    .card {
+        padding: 1.5rem;
+    }
+
+    .cta-content {
+        padding: 2rem 1.25rem;
+    }
+}

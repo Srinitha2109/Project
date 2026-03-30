@@ -156,8 +156,57 @@
      font-weight: 700;
  }
 
- @media (max-width: 600px) {
+ @media (max-width: 768px) {
+     .auth-container {
+         padding: 1.5rem 1rem;
+         align-items: flex-start;
+     }
+
+     .auth-card {
+         padding: 2rem 1.25rem;
+         border-radius: 10px;
+         max-width: 100%;
+     }
+
+     .auth-header {
+         margin-bottom: 2rem;
+     }
+
+     .auth-header h1 {
+         font-size: 1.45rem;
+         letter-spacing: 1px;
+     }
+
      .two-cols {
          grid-template-columns: 1fr;
+     }
+
+     .form-control {
+         padding: 0.85rem 0.9rem;
+     }
+
+     .auth-btn {
+         font-size: 1rem;
+         padding: 1rem;
+     }
+ }
+
+ @media (max-width: 480px) {
+     .auth-container {
+         padding: 1rem 0.75rem;
+         min-height: 100%;
+     }
+
+     .auth-card {
+         padding: 1.5rem 1rem;
+         border: 1px solid var(--primary-burgundy);
+     }
+
+     .auth-header h1 {
+         font-size: 1.25rem;
+     }
+
+     .conditional-section {
+         padding: 16px;
      }
  }

@@ -1,4 +1,9 @@
 <div class="dashboard-layout" [class.collapsed]="isSidebarCollapsed()">
+  <!-- Mobile Overlay Backdrop -->
+  @if (!isSidebarCollapsed()) {
+  <div class="mobile-backdrop" (click)="toggleSidebar()"></div>
+  }
+
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
@@ -11,13 +16,13 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a routerLink="/agent/dashboard" routerLinkActive="active" class="nav-item">
+      <a routerLink="/agent/dashboard" routerLinkActive="active" class="nav-item" (click)="closeSidebarOnMobile()">
         <span class="material-icons icon">dashboard</span>
         @if (!isSidebarCollapsed()) {
           <span class="label">Overview</span>
         }
       </a>
-      <a routerLink="/agent/requests" routerLinkActive="active" class="nav-item">
+      <a routerLink="/agent/requests" routerLinkActive="active" class="nav-item" (click)="closeSidebarOnMobile()">
         <span class="material-icons icon">inbox</span>
         @if (!isSidebarCollapsed()) {
           <span class="label">Requests</span>
@@ -39,6 +44,10 @@
   <main class="main-workspace">
     <header class="workspace-header">
       <div class="page-title">
+        <!-- Mobile hamburger -->
+        <button class="mobile-toggle-btn" (click)="toggleSidebar()">
+          <span class="material-icons">menu</span>
+        </button>
         <h2 class="title-text">Agent Console</h2>
       </div>
 
@@ -69,6 +78,16 @@
   width: 100vw;
   overflow: hidden;
   background: #f8fafc;
+  position: relative;
+}
+
+/* Mobile backdrop overlay */
+.mobile-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 40;
 }
 
 /* Fixed Sidebar */
@@ -78,8 +97,10 @@ background: white;
 border-right: 1px solid #e2e8f0;
 display: flex;
 flex-direction: column;
-transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease;
 flex-shrink: 0;
+position: relative;
+z-index: 50;
 }
 
 .collapsed .sidebar {
@@ -105,6 +126,18 @@ padding: 5px;
 display: flex;
 align-items: center;
 border-radius: 6px;
+}
+
+.mobile-toggle-btn {
+display: none;
+background: none;
+border: none;
+color: #7a0019;
+cursor: pointer;
+padding: 6px;
+border-radius: 6px;
+align-items: center;
+justify-content: center;
 }
 
 .header-text {
@@ -156,6 +189,7 @@ flex: 1;
 display: flex;
 flex-direction: column;
 overflow: hidden;
+min-width: 0;
 }
 
 .workspace-header {
@@ -169,12 +203,19 @@ padding: 0 32px;
 flex-shrink: 0;
 }
 
+.page-title {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
 .title-text {
 font-size: 1.2rem;
 font-weight: 900;
 color: #7a0019;
 text-transform: uppercase;
 letter-spacing: 1px;
+margin: 0;
 }
 
 .header-actions {
@@ -235,5 +276,60 @@ background: #f8fafc;
 @media (max-width: 1024px) {
 .user-info { display: none; }
 .workspace-header { padding: 0 20px; }
+}
+
+@media (max-width: 767px) {
+  .mobile-backdrop {
+    display: block;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 260px !important;
+    transform: translateX(-100%);
+  }
+
+  .collapsed .sidebar {
+    width: 80px !important;
+    transform: translateX(0) !important;
+  }
+
+  /* When sidebar is NOT collapsed (open), show it */
+  .dashboard-layout:not(.collapsed) .sidebar {
+    transform: translateX(0);
+  }
+
+  .mobile-toggle-btn {
+    display: flex;
+  }
+
+  .toggle-btn {
+    display: none;
+  }
+
+  .workspace-header {
+    padding: 0 16px;
+    height: 60px;
+  }
+
+  .title-text {
+    font-size: 1rem;
+  }
+
+  .header-actions {
+    gap: 12px;
+  }
+
+  .user-profile {
+    padding-left: 12px;
+    gap: 8px;
+  }
+
+  .content-area {
+    padding: 16px;
+  }
 }
 </style>

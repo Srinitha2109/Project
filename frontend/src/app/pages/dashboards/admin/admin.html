@@ -1,8 +1,19 @@
 <div class="flex h-screen overflow-hidden bg-slate-50 font-sans">
+    <!-- Mobile Overlay Backdrop -->
+    @if (isSidebarOpen()) {
+    <div class="fixed inset-0 bg-black/30 z-40 md:hidden" (click)="toggleSidebar()"></div>
+    }
+
     <!-- Sidebar -->
-    <aside class="flex flex-col bg-white border-r border-slate-200 shadow-sm transition-all duration-300 z-50 shrink-0"
-        [class.w-64]="isSidebarOpen()" [class.w-20]="!isSidebarOpen()">
-        <div class="h-16 flex items-center px-6 gap-4 border-b border-slate-200">
+    <aside class="flex flex-col bg-white border-r border-slate-200 shadow-sm transition-all duration-300 z-50 shrink-0
+        fixed md:relative h-full
+        md:translate-x-0"
+        [class.w-64]="isSidebarOpen()"
+        [class.w-20]="!isSidebarOpen()"
+        [class.-translate-x-full]="!isSidebarOpen()"
+        [class.translate-x-0]="isSidebarOpen()"
+        style="transition: width 0.3s ease, transform 0.3s ease;">
+        <div class="h-16 flex items-center px-4 gap-4 border-b border-slate-200 shrink-0">
             <button (click)="toggleSidebar()"
                 class="p-2 rounded-md hover:bg-burgundy/5 text-burgundy transition-colors focus:outline-none">
                 <span class="material-icons text-xl leading-none">menu</span>
@@ -15,7 +26,8 @@
         <nav class="flex-1 flex flex-col p-4 gap-2 overflow-y-auto">
             <a routerLink="/admin/dashboard" routerLinkActive="bg-burgundy text-white shadow-md"
                 [routerLinkActiveOptions]="{exact: true}"
-                class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy">
+                class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy"
+                (click)="closeSidebarOnMobile()">
                 <span class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">dashboard</span>
                 @if (isSidebarOpen()) {
                 <span class="font-semibold tracking-wide">Overview</span>
@@ -23,7 +35,8 @@
             </a>
 
             <a routerLink="/admin/requests" routerLinkActive="bg-burgundy text-white shadow-md"
-                class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy">
+                class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy"
+                (click)="closeSidebarOnMobile()">
                 <span class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">inbox</span>
                 @if (isSidebarOpen()) {
                 <span class="font-semibold tracking-wide">Requests</span>
@@ -31,7 +44,8 @@
             </a>
 
             <a routerLink="/admin/policies" routerLinkActive="bg-burgundy text-white shadow-md"
-                class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy">
+                class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy"
+                (click)="closeSidebarOnMobile()">
                 <span class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">security</span>
                 @if (isSidebarOpen()) {
                 <span class="font-semibold tracking-wide">Policies</span>
@@ -39,7 +53,8 @@
             </a>
 
             <a routerLink="/admin/policyholders" routerLinkActive="bg-burgundy text-white shadow-md"
-                class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy">
+                class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy"
+                (click)="closeSidebarOnMobile()">
                 <span class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">group</span>
                 @if (isSidebarOpen()) {
                 <span class="font-semibold tracking-wide">Assign Staff</span>
@@ -47,7 +62,8 @@
             </a>
 
             <a routerLink="/admin/users" routerLinkActive="bg-burgundy text-white shadow-md"
-                class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy">
+                class="flex items-center p-3 rounded-lg transition-all duration-200 cursor-pointer gap-3 group text-slate-600 hover:bg-burgundy/5 hover:text-burgundy"
+                (click)="closeSidebarOnMobile()">
                 <span class="material-icons text-xl w-6 flex justify-center group-hover:scale-110 transition-transform">settings</span>
                 @if (isSidebarOpen()) {
                 <span class="font-semibold tracking-wide">Users</span>
@@ -67,25 +83,30 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col overflow-y-auto">
+    <main class="flex-1 flex flex-col overflow-y-auto min-w-0">
         <!-- Header -->
         <header
-            class="bg-white border-b border-slate-200 shadow-sm flex items-center justify-between p-4 px-8 sticky top-0 z-40">
-            <div>
-                <h1 class="text-xl font-black text-burgundy tracking-tight uppercase">Administrator Dashboard</h1>
+            class="bg-white border-b border-slate-200 shadow-sm flex items-center justify-between p-3 px-4 md:px-8 sticky top-0 z-40">
+            <div class="flex items-center gap-3">
+                <!-- Mobile menu button -->
+                <button (click)="toggleSidebar()"
+                    class="p-2 rounded-md hover:bg-burgundy/5 text-burgundy transition-colors focus:outline-none md:hidden">
+                    <span class="material-icons text-xl leading-none">menu</span>
+                </button>
+                <h1 class="text-base md:text-xl font-black text-burgundy tracking-tight uppercase">Administrator Dashboard</h1>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 md:gap-4">
                 <app-notification-bell></app-notification-bell>
                 <span class="text-sm font-semibold text-slate-700 hidden sm:block">{{ currentUser()?.fullName }}</span>
-                <div class="w-10 h-10 bg-burgundy text-white rounded-full flex items-center justify-center font-black shadow-inner ring-4 ring-pink/20">
+                <div class="w-9 h-9 md:w-10 md:h-10 bg-burgundy text-white rounded-full flex items-center justify-center font-black shadow-inner ring-4 ring-pink/20 text-sm">
                     {{ getUserInitials() }}
                 </div>
             </div>
         </header>
 
         <!-- Content Area -->
-        <div class="p-8 w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div class="p-4 md:p-8 w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
             <router-outlet></router-outlet>
         </div>
     </main>
-</div>
+</div>
