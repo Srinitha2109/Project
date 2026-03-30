@@ -5,8 +5,8 @@
     }
 
     <!-- Sidebar -->
-    <aside class="flex flex-col bg-white border-r border-slate-200 shadow-sm z-50 shrink-0
-        fixed md:relative h-full"
+    <aside class="flex flex-col bg-white border-r border-slate-200 shadow-sm transition-all duration-300 z-50 shrink-0
+        fixed md:relative h-full md:translate-x-0"
         [class.w-64]="!isSidebarCollapsed()"
         [class.w-20]="isSidebarCollapsed()"
         [class.-translate-x-full]="isSidebarCollapsed()"

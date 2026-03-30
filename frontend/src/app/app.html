@@ -3,15 +3,16 @@
   @if (!isDashboard()) {
   <nav class="navbar">
     <div class="nav-content">
-      <a routerLink="/" class="logo">
+      <a routerLink="/" class="logo" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="var(--primary-burgundy)">
+          <path d="M12 2l-9 4v6.5c0 5.14 3.84 9.94 9 11.5 5.16-1.56 9-6.36 9-11.5V6l-9-4zm0 18.5c-4.14-1.39-7.23-5.32-7.5-9.66V7.4l7.5-3.33 7.5 3.33v3.1c-.27 4.34-3.36 8.27-7.5 9.66z"/>
+          <path d="M10 16l-4-4 1.41-1.41L10 13.17l6.59-6.59L18 8l-8 8z"/>
+        </svg>
         <span class="logo-text">Fortify<span class="logo-accent"></span></span>
       </a>
       <div class="nav-links">
         <a routerLink="/landing" routerLinkActive="active" class="nav-item">Home</a>
-        <!-- <button (click)="themeService.toggleTheme()" class="theme-toggle"
-          [attr.aria-label]="themeService.isDark() ? 'Switch to light mode' : 'Switch to dark mode'">
-          <span class="icon">{{ themeService.isDark() ? '☼' : '☾' }}</span>
-        </button> -->
+        
         <a routerLink="/login" class="btn btn-primary login-btn">Login</a>
       </div>
     </div>
